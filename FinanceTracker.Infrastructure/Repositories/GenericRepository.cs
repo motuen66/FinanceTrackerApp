@@ -65,5 +65,11 @@ namespace FinanceTracker.Infrastructure.Repositories
             var filter = Builders<TEntity>.Filter.Eq("_id", GetId(entity));
             await _collection.ReplaceOneAsync(filter, entity);
         }
+
+        public async Task UpdatePartialAsync(string id, UpdateDefinition<TEntity> updateDefinition)
+        {
+            var filter = Builders<TEntity>.Filter.Eq("_id", new ObjectId(id));
+            await _collection.UpdateOneAsync(filter, updateDefinition);
+        }
     }
 }

@@ -1,15 +1,24 @@
 using FinanceTracker.Infrastructure.Database;
 using FinanceTracker.Infrastructure.Repositories;
 using FinanceTracker.Services;
+using FinanceTracker.Services.DTOs;
 using FinanceTracker.Services.Interfaces.Repositories;
 using FinanceTracker.Services.Interfaces.Services;
+using MongoDB.Bson.Serialization.Conventions;
 
 var builder = WebApplication.CreateBuilder(args);
+var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
+ConventionRegistry.Register("camelCase", camelCaseConvention, _ => true);
 
 // Add services to the container.
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings")
 );
+
+builder.Services.AddAutoMapper(config =>
+{
+    config.AddMaps((typeof(MappingProfile).Assembly));
+});
 
 builder.Services.AddSingleton<MongoDbContext>(sp =>
 {
