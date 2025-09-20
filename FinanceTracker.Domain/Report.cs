@@ -13,7 +13,7 @@ namespace FinanceTracker.Domain
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public int Id { get; set; }
+        public string Id { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
         public decimal TotalIncome { get; set; }
