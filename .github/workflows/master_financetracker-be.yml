@@ -22,6 +22,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+      - name: Prepare appsettings.Production.json
+        shell: pwsh
+        run: |
+          $json = Get-Content 'FinanceTracker.API/appsettings.json' | ConvertFrom-Json
+          $json.MongoDbSettings.ConnectionStrings = "${{ secrets.MONGO_DB_CONNECTION_STRING }}"
+          $json | ConvertTo-Json -Depth 10 | Set-Content 'FinanceTracker.API/appsettings.json'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
@@ -62,4 +68,5 @@ jobs:
           app-name: 'financetracker-be'
           slot-name: 'Production'
           package: .
+
           
