@@ -10,6 +10,6 @@ namespace FinanceTracker.Services.DTOs.SavingGoalDtos
         public decimal CurrentAmount { get; set; }
         public DateTime GoalDate { get; set; }
         public bool IsCompleted { get; set; } = false;
-        public string UserId { get; set; } = null!;
+        public string? UserId { get; set; } = null!;
     }
 }
