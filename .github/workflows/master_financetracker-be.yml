@@ -26,7 +26,7 @@ jobs:
         shell: pwsh
         run: |
           $json = Get-Content 'FinanceTracker.API/appsettings.json' | ConvertFrom-Json
-          $json.MongoDbSettings.ConnectionStrings = "${{ secrets.MONGO_DB_CONNECTION_STRING }}"
+          $json.MongoDbSettings.ConnectionString = "${{ secrets.MONGO_DB_CONNECTION_STRING }}"
           $json | ConvertTo-Json -Depth 10 | Set-Content 'FinanceTracker.API/appsettings.json'
 
       - name: Build with dotnet
@@ -70,3 +70,4 @@ jobs:
           package: .
 
           
+
