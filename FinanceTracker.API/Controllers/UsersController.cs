@@ -1,4 +1,4 @@
-using AutoMapper;
+ using AutoMapper;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.UserDtos;
 using FinanceTracker.Services.Interfaces.Services;
