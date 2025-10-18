@@ -31,7 +31,7 @@ jobs:
       - name: Inject MongoDB connection string
         shell: pwsh
         run: |
-          $jsonPath = "${{ env.PROJECT_PATH }}/appsettings.json"
+          $jsonPath = "FinanceTracker.API/appsettings.json" 
           $json = Get-Content $jsonPath | ConvertFrom-Json
           $json.MongoDbSettings.ConnectionString = "${{ secrets.MONGO_DB_CONNECTION_STRING }}"
           $json | ConvertTo-Json -Depth 10 | Set-Content $jsonPath
@@ -57,4 +57,5 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ${{ env.PUBLISH_DIR }}
+
 
