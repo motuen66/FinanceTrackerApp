@@ -67,7 +67,7 @@ app.UseSwaggerUI(c =>
 
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
