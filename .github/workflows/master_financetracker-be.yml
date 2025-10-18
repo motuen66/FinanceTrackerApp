@@ -9,7 +9,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: financetracker-be
   DOTNET_VERSION: '8.0.x'
-  PROJECT_PATH: FinanceTracker.API
+  PROJECT_PATH: FinanceTracker.API/FinanceTracker.API.csproj
   PUBLISH_DIR: publish
 
 jobs:
@@ -57,3 +57,4 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ${{ env.PUBLISH_DIR }}
+
