@@ -7,6 +7,10 @@ using FinanceTracker.Services.Interfaces.Services;
 using MongoDB.Bson.Serialization.Conventions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://*:{port}");
+
 var camelCaseConvention = new ConventionPack { new CamelCaseElementNameConvention() };
 ConventionRegistry.Register("camelCase", camelCaseConvention, _ => true);
 
@@ -72,8 +76,5 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 
 app.MapControllers();
-
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://*:{port}");
 
 app.Run();
