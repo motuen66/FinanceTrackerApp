@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace FinanceTracker.Services.Interfaces.Repositories
 {
@@ -13,5 +14,6 @@ namespace FinanceTracker.Services.Interfaces.Repositories
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(string id);
+        Task UpdatePartialAsync(string id, UpdateDefinition<TEntity> updateDefinition);
     }
 }

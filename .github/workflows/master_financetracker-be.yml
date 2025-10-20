@@ -1,0 +1,71 @@
+name: Build and deploy ASP.NET Core app to Azure Web App - financetracker-be
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Prepare appsettings.json
+        shell: pwsh
+        run: |
+          $json = Get-Content 'FinanceTracker.API/appsettings.json' | ConvertFrom-Json
+          $json.MongoDbSettings.ConnectionString = "${{ secrets.MONGO_DB_CONNECTION_STRING }}"
+          # $json.JwtConfig.Key = "${{ secrets.JWT_SECRET }}"
+          # $json.JwtConfig.Issuer = "${{ secrets.JWT_ISSUER }}"
+          # $json.JwtConfig.Audience = "${{ secrets.JWT_AUDIENCE }}"
+          # $json.MongoDb.DatabaseName = "${{ secrets.MONGO_DB_NAME }}"
+          $json | ConvertTo-Json -Depth 10 | Set-Content 'FinanceTracker.API/appsettings.json'
+
+      - name: Build with dotnet
+        run: dotnet build FinanceTracker.API/FinanceTracker.API.csproj --configuration Release
+
+      - name: Publish
+        run: dotnet publish FinanceTracker.API/FinanceTracker.API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_0DBB9B1EC10A43A8AA21EFA1FF64F524 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A599A0C337ED4E91AE241FD3429B4AE4 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5AD8F71C75564EF2ADE5A133DE23C8E0 }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'financetracker-be'
+          slot-name: 'Production'
+          package: .

@@ -54,3 +54,7 @@ TestResult.xml
 nunit-*.xml
 
 .vs/
+
+# Do not commit development appsettings with secrets
+# Ignore the development config which may contain connection strings / keys
+appsettings.Development.json

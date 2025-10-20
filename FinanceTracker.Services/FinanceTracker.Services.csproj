@@ -7,7 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.0.1" />
+    <PackageReference Include="MongoDB.Driver" Version="3.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FinanceTracker.Domain\FinanceTracker.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\CategoryDtos\" />
+    <Folder Include="DTOs\BudgetDtos\" />
+    <Folder Include="DTOs\UserDtos\" />
+    <Folder Include="DTOs\ReportDtos\" />
+    <Folder Include="DTOs\TransactionDtos\" />
   </ItemGroup>
 
 </Project>
