@@ -1,4 +1,5 @@
  using AutoMapper;
+using FinanceTracker.API.Handlers;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.UserDtos;
 using FinanceTracker.Services.Interfaces.Services;
@@ -47,6 +48,9 @@ namespace FinanceTracker.API.Controllers
             }
 
             var user = _mapper.Map<User>(dto);
+            // Normalize email and hash password before saving
+            user.Email = user.Email.Trim().ToLowerInvariant();
+            user.PasswordHash = PasswordHashHandler.HashPassword(dto.PasswordHash);
             user.CreatedAt = DateTime.UtcNow;
             user.UpdatedAt = DateTime.UtcNow;
 
@@ -71,6 +75,9 @@ namespace FinanceTracker.API.Controllers
             }
 
             _mapper.Map(dto, existing);
+            // Normalize email and hash password before updating
+            existing.Email = existing.Email.Trim().ToLowerInvariant();
+            existing.PasswordHash = PasswordHashHandler.HashPassword(dto.PasswordHash);
             existing.UpdatedAt = DateTime.UtcNow;
 
             await _userService.UpdateAsync(existing);
