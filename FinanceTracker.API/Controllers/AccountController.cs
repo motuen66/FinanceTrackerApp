@@ -70,7 +70,7 @@ namespace FinanceTracker.API.Controllers
                 Email = dto.Email,
                 Password = dto.Password
             };
-            var response = _jwtService.Authenticate(loginReq);
+            var response = await _jwtService.Authenticate(loginReq);
             if(response == null)
             {
                 return BadRequest(response);
