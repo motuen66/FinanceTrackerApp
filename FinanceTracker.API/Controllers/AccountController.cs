@@ -45,7 +45,7 @@ namespace FinanceTracker.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] UserMutationDto dto)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -64,7 +64,19 @@ namespace FinanceTracker.API.Controllers
             newUser.UpdatedAt = DateTime.UtcNow;
 
             await _userService.AddAsync(newUser);
-            return CreatedAtAction(nameof(Register), new {id = newUser.Id }, new {msg = "Account has been created successfully."});
+            
+            var loginReq = new LoginRequestModel
+            {
+                Email = dto.Email,
+                Password = dto.Password
+            };
+            var response = _jwtService.Authenticate(loginReq);
+            if(response == null)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
     }
 }
