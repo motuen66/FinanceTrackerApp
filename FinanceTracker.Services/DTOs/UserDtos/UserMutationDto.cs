@@ -14,6 +14,6 @@ namespace FinanceTracker.Services.DTOs.UserDtos
 
         [Required]
         [StringLength(200)]
-        public string PasswordHash { get; set; } = null!;
+        public string Password { get; set; } = null!;
     }
 }
