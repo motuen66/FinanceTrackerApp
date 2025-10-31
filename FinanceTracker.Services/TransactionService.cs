@@ -20,5 +20,9 @@ namespace FinanceTracker.Services
         {
             return _transactionRepository.GetByUserIdAndDateRangeAsync(userId, from, to);
         }
+        public Task<IEnumerable<Transaction>> GetByFilterAsync(string? userId, DateTime? from, DateTime? to, string? type)
+        {
+            return _transactionRepository.GetByFilterAsync(userId, from, to, type);
+        }
     }
 }

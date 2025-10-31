@@ -29,5 +29,31 @@ namespace FinanceTracker.Infrastructure.Repositories
 
             return await Collection.Find(filter).ToListAsync();
         }
+
+        public async Task<IEnumerable<Transaction>> GetByFilterAsync(string? userId, DateTime? from, DateTime? to, string? type)
+        {
+            var builder = Builders<Transaction>.Filter;
+            var filter = builder.Empty;
+
+            if (from.HasValue)
+            {
+                filter = filter & builder.Gte(t => t.Date, from.Value);
+            }
+            if (to.HasValue)
+            {
+                // exclusive upper bound
+                filter = filter & builder.Lt(t => t.Date, to.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                filter = filter & builder.Eq(t => t.Type, type);
+            }
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                filter = filter & builder.Eq("userId", new ObjectId(userId));
+            }
+
+            return await Collection.Find(filter).ToListAsync();
+        }
     }
 }
