@@ -9,16 +9,22 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace FinanceTracker.Domain
 {
     [BsonCollection("budgets")]
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class Budget
     {
-        [BsonId]
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = null!;
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
         public string UserId { get; set; } = null!;
-        public User? User { get; set; }
-        public string CategoryId { get; set; } = null!;
-        Category Category { get; set; } = null!;
-        public decimal LimitAmount { get; set; }
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public User? User { get; set; }
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string CategoryId { get; set; } = null!;
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public Category? Category { get; set; }
+    [BsonRepresentation(BsonType.Decimal128)]
+    public decimal LimitAmount { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
     }
