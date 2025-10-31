@@ -9,6 +9,7 @@ using MongoDB.Bson;
 namespace FinanceTracker.Domain
 {
     [BsonCollection("users")]
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnoreExtraElements]
     public class User
     {
         [BsonId]
@@ -19,10 +20,14 @@ namespace FinanceTracker.Domain
         public string PasswordHash { get; set; } = null!; // Store hashed password
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        // Navigation properties
-        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
-        public List<Category> Categories { get; set; } = new List<Category>();
-        public List<SavingGoal> SavingGoals { get; set; } = new List<SavingGoal>();
-        public List<Budget> Budgets { get; set; } = new List<Budget>();
+    // Navigation properties (ignored for persistence; use dedicated repo methods / aggregation when needed)
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public List<Transaction> Transactions { get; set; } = new List<Transaction>();
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public List<Category> Categories { get; set; } = new List<Category>();
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public List<SavingGoal> SavingGoals { get; set; } = new List<SavingGoal>();
+    [MongoDB.Bson.Serialization.Attributes.BsonIgnore]
+    public List<Budget> Budgets { get; set; } = new List<Budget>();
     }
 }
