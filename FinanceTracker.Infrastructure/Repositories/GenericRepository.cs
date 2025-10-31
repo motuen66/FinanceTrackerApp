@@ -23,8 +23,11 @@ namespace FinanceTracker.Infrastructure.Repositories
             {
                 throw new InvalidOperationException($"Can not find BsonCollectionAttribute for class {typeof(TEntity).Name}.");
             }
+            _context = context;
             _collection = context.GetCollection<TEntity>(collectionAttribute.CollectionName);
         }
+        // expose to derived repositories for advanced queries
+        protected IMongoCollection<TEntity> Collection => _collection;
         public async Task AddAsync(TEntity entity)
         {
             await _collection.InsertOneAsync(entity);

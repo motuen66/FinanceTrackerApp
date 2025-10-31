@@ -9,5 +9,6 @@ namespace FinanceTracker.Services.Interfaces.Repositories
 {
     public interface ITransactionRepository : IGenericRepository<Transaction>
     {
+        Task<IEnumerable<Transaction>> GetByUserIdAndDateRangeAsync(string userId, DateTime from, DateTime to);
     }
 }

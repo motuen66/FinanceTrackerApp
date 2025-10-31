@@ -19,6 +19,23 @@ namespace FinanceTracker.API.Controllers
             _mapper = mapper;
         }
 
+        // GET api/transactions/range?userId={userId}&from=2025-10-01&to=2025-10-31 (dates only, format: yyyy-MM-dd)
+        [HttpGet("range")]
+        public async Task<ActionResult<IEnumerable<TransactionViewDto>>> GetByRange([FromQuery] string? userId, [FromQuery] DateOnly from, [FromQuery] DateOnly to)
+        {
+            if (from > to)
+            {
+                return BadRequest(new { message = "from must be <= to" });
+            }
+
+            // Normalize to date-only: include entire 'to' day by making the upper bound exclusive at next day
+            var fromDate = from.ToDateTime(TimeOnly.MinValue);
+            var toExclusive = to.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            var results = await _transactionService.GetByUserIdAndDateRangeAsync(userId ?? string.Empty, fromDate, toExclusive);
+            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(results));
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionViewDto>>> GetAll()
         {
