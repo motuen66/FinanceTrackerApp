@@ -9,5 +9,7 @@ namespace FinanceTracker.Services.Interfaces.Services
 {
     public interface ITransactionService : IGenericService<Transaction>
     {
+        Task<IEnumerable<Transaction>> GetByUserIdAndDateRangeAsync(string userId, DateTime from, DateTime to);
+        Task<IEnumerable<Transaction>> GetByFilterAsync(string? userId, DateTime? from, DateTime? to, string? type);
     }
 }

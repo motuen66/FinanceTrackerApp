@@ -1,3 +1,4 @@
+using System;
 using AutoMapper;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.TransactionDtos;
@@ -17,6 +18,47 @@ namespace FinanceTracker.API.Controllers
         {
             _transactionService = transactionService;
             _mapper = mapper;
+        }
+
+    // GET api/transactions/range?userId={userId}&from=2025-10-01&to=2025-10-31 (dates only, format: yyyy-MM-dd)
+        [HttpGet("range")]
+        public async Task<ActionResult<IEnumerable<TransactionViewDto>>> GetByRange([FromQuery] string? userId, [FromQuery] DateOnly from, [FromQuery] DateOnly to)
+        {
+            if (from > to)
+            {
+                return BadRequest(new { message = "from must be <= to" });
+            }
+
+            // Normalize to date-only: include entire 'to' day by making the upper bound exclusive at next day
+            var fromDate = from.ToDateTime(TimeOnly.MinValue);
+            var toExclusive = to.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            var results = await _transactionService.GetByUserIdAndDateRangeAsync(userId ?? string.Empty, fromDate, toExclusive);
+            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(results));
+        }
+
+        // GET api/transactions/bytype?type=Income&userId={userId}&from=2025-10-01&to=2025-10-31
+        [HttpGet("bytype")]
+        public async Task<ActionResult<IEnumerable<TransactionViewDto>>> GetByType([FromQuery] string type, [FromQuery] string? userId, [FromQuery] DateOnly? from, [FromQuery] DateOnly? to)
+        {
+            if (string.IsNullOrWhiteSpace(type))
+            {
+                return BadRequest(new { message = "type is required (Income or Expense)" });
+            }
+
+            DateTime? fromDt = null;
+            DateTime? toDt = null;
+            if (from.HasValue)
+            {
+                fromDt = from.Value.ToDateTime(TimeOnly.MinValue);
+            }
+            if (to.HasValue)
+            {
+                toDt = to.Value.AddDays(1).ToDateTime(TimeOnly.MinValue); // exclusive
+            }
+
+            var results = await _transactionService.GetByFilterAsync(userId, fromDt, toDt, type);
+            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(results));
         }
 
         [HttpGet]
