@@ -14,8 +14,8 @@ namespace FinanceTracker.Infrastructure.Repositories
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        private readonly IMongoCollection<TEntity> _collection;
-        private readonly MongoDbContext _context;
+        public readonly IMongoCollection<TEntity> _collection;
+        public readonly MongoDbContext _context;
         public GenericRepository(MongoDbContext context)
         {
             var collectionAttribute = typeof(TEntity).GetCustomAttribute<BsonCollectionAttribute>();

@@ -1,3 +1,5 @@
+using FinanceTracker.Services.DTOs.CategoryDtos;
+
 namespace FinanceTracker.Services.DTOs.BudgetDtos
 {
     public class BudgetViewDto
@@ -8,5 +10,6 @@ namespace FinanceTracker.Services.DTOs.BudgetDtos
         public decimal LimitAmount { get; set; }
         public int Month { get; set; }
         public int Year { get; set; }
+        public string CategoryName { get; set; } = null!;
     }
 }

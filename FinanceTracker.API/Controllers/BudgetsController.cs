@@ -22,8 +22,8 @@ namespace FinanceTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BudgetViewDto>>> GetAll()
         {
-            var budgets = await _budgetService.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<BudgetViewDto>>(budgets));
+            List<BudgetViewDto> budgets = await _budgetService.GetAllIncludeCategoryAsync();
+            return Ok(budgets);
         }
 
         [HttpGet("{id}")]

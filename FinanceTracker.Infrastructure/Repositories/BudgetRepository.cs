@@ -5,14 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using FinanceTracker.Domain;
 using FinanceTracker.Infrastructure.Database;
+using FinanceTracker.Services.DTOs.BudgetDtos;
 using FinanceTracker.Services.Interfaces.Repositories;
+using MongoDB.Driver;
 
 namespace FinanceTracker.Infrastructure.Repositories
 {
     public class BudgetRepository : GenericRepository<Budget>, IBudgetRepository
     {
+        public readonly IMongoCollection<Budget> _collection;
+        public readonly MongoDbContext _context;
+
         public BudgetRepository(MongoDbContext context) : base(context)
         {
+            _context = context;
+            // Use lowercase collection names to match BsonCollection attributes and existing DB
+            _collection = context.GetCollection<Budget>("budgets");
         }
     }
 }
