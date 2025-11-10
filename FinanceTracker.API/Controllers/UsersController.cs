@@ -3,13 +3,14 @@ using FinanceTracker.API.Handlers;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.UserDtos;
 using FinanceTracker.Services.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : AuthenticatedControllerBase
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -20,16 +21,32 @@ namespace FinanceTracker.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserViewDto>>> GetAll()
+        // Get current user's profile
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<UserViewDto>> GetCurrentUser()
         {
-            var users = await _userService.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<UserViewDto>>(users));
+            var userId = GetAuthenticatedUserId();
+            var user = await _userService.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<UserViewDto>(user));
         }
 
+        // Get user by ID (only if it's the authenticated user)
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserViewDto>> GetById(string id)
         {
+            var userId = GetAuthenticatedUserId();
+            if (id != userId)
+            {
+                return Forbid(); // Users can only view their own profile
+            }
+
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
             {
@@ -39,6 +56,8 @@ namespace FinanceTracker.API.Controllers
             return Ok(_mapper.Map<UserViewDto>(user));
         }
 
+        // Registration endpoint (no authorization required)
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<UserViewDto>> Create([FromBody] UserMutationDto dto)
         {
@@ -60,12 +79,20 @@ namespace FinanceTracker.API.Controllers
             return CreatedAtAction(nameof(GetById), new { id = view.Id }, view);
         }
 
+        // Update user profile (only the authenticated user can update their own profile)
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<UserViewDto>> Update(string id, [FromBody] UserMutationDto dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            var userId = GetAuthenticatedUserId();
+            if (id != userId)
+            {
+                return Forbid(); // Users can only update their own profile
             }
 
             var existing = await _userService.GetByIdAsync(id);
@@ -85,9 +112,17 @@ namespace FinanceTracker.API.Controllers
             return Ok(_mapper.Map<UserViewDto>(existing));
         }
 
+        // Delete user account (only the authenticated user can delete their own account)
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
+            var userId = GetAuthenticatedUserId();
+            if (id != userId)
+            {
+                return Forbid(); // Users can only delete their own account
+            }
+
             var existing = await _userService.GetByIdAsync(id);
             if (existing == null)
             {

@@ -7,6 +7,8 @@ using FinanceTracker.Domain;
 using FinanceTracker.Infrastructure.Database;
 using FinanceTracker.Services.Interfaces.Repositories;
 using FinanceTracker.Services.Interfaces.Services;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace FinanceTracker.Infrastructure.Repositories
 {
@@ -14,6 +16,12 @@ namespace FinanceTracker.Infrastructure.Repositories
     {
         public SavingGoalRepository(MongoDbContext context) : base(context)
         {
+        }
+
+        public async Task<IEnumerable<SavingGoal>> GetByUserIdAsync(string userId)
+        {
+            var filter = Builders<SavingGoal>.Filter.Eq("userId", new ObjectId(userId));
+            return await Collection.Find(filter).ToListAsync();
         }
     }
 }

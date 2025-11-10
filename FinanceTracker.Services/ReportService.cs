@@ -16,5 +16,10 @@ namespace FinanceTracker.Services
         {
             _reportRepository = reportRepository;
         }
+
+        public Task<IEnumerable<Report>> GetByUserIdAsync(string userId)
+        {
+            return _reportRepository.GetByUserIdAsync(userId);
+        }
     }
 }

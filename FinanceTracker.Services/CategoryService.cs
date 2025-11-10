@@ -16,5 +16,10 @@ namespace FinanceTracker.Services
         {
             _categoryRepository = categoryRepository;
         }
+
+        public Task<IEnumerable<Category>> GetByUserIdAsync(string userId)
+        {
+            return _categoryRepository.GetByUserIdAsync(userId);
+        }
     }
 }

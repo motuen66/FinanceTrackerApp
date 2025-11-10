@@ -9,5 +9,6 @@ namespace FinanceTracker.Services.Interfaces.Repositories
 {
     public interface ISavingGoalRepository : IGenericRepository<SavingGoal>
     {
+        Task<IEnumerable<SavingGoal>> GetByUserIdAsync(string userId);
     }
 }

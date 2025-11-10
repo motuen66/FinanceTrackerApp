@@ -14,6 +14,7 @@ namespace FinanceTracker.Services.Interfaces.Services
         Task<IEnumerable<Transaction>> GetByFilterAsync(string? userId, DateTime? from, DateTime? to, string? type);
 
         Task<List<TransactionViewDto>> GetAllWithCategoryNameAsync();
+        Task<List<TransactionViewDto>> GetAllWithCategoryNameByUserIdAsync(string userId);
         Task<List<TransactionViewDto>> GetByRangeWithCategoryNameAsync(string userId, DateTime from, DateTime to);
         Task<List<TransactionViewDto>> GetByFilterWithCategoryNameAsync(string? userId, DateTime? from, DateTime? to, string? type);
         Task<TransactionViewDto?> GetByIdWithCategoryNameAsync(string id);

@@ -16,6 +16,13 @@ namespace FinanceTracker.Infrastructure.Repositories
         public TransactionRepository(MongoDbContext context) : base(context)
         {
         }
+
+        public async Task<IEnumerable<Transaction>> GetByUserIdAsync(string userId)
+        {
+            var filter = Builders<Transaction>.Filter.Eq("userId", new ObjectId(userId));
+            return await Collection.Find(filter).ToListAsync();
+        }
+
         public async Task<IEnumerable<Transaction>> GetByUserIdAndDateRangeAsync(string userId, DateTime from, DateTime to)
         {
             var builder = Builders<Transaction>.Filter;

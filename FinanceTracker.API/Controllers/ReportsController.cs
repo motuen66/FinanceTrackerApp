@@ -2,13 +2,15 @@ using AutoMapper;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.ReportDtos;
 using FinanceTracker.Services.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ReportsController : ControllerBase
+    public class ReportsController : AuthenticatedControllerBase
     {
         private readonly IReportService _reportService;
         private readonly IMapper _mapper;
@@ -22,7 +24,8 @@ namespace FinanceTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReportViewDto>>> GetAll()
         {
-            var reports = await _reportService.GetAllAsync();
+            var userId = GetAuthenticatedUserId();
+            var reports = await _reportService.GetByUserIdAsync(userId);
             return Ok(_mapper.Map<IEnumerable<ReportViewDto>>(reports));
         }
 
@@ -33,6 +36,13 @@ namespace FinanceTracker.API.Controllers
             if (report == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this report
+            var userId = GetAuthenticatedUserId();
+            if (report.UserId != userId)
+            {
+                return Forbid();
             }
 
             return Ok(_mapper.Map<ReportViewDto>(report));
@@ -46,7 +56,9 @@ namespace FinanceTracker.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var userId = GetAuthenticatedUserId();
             var report = _mapper.Map<Report>(dto);
+            report.UserId = userId; // Ensure report belongs to authenticated user
             await _reportService.AddAsync(report);
 
             var view = _mapper.Map<ReportViewDto>(report);
@@ -67,6 +79,13 @@ namespace FinanceTracker.API.Controllers
                 return NotFound();
             }
 
+            // Verify user owns this report
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
+            }
+
             _mapper.Map(dto, existing);
             await _reportService.UpdateAsync(existing);
 
@@ -80,6 +99,13 @@ namespace FinanceTracker.API.Controllers
             if (existing == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this report
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
             }
 
             await _reportService.DeleteAsync(id);

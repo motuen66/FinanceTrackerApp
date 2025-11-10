@@ -9,5 +9,6 @@ namespace FinanceTracker.Services.Interfaces.Repositories
 {
     public interface ICategoryRepository : IGenericRepository<Category>
     {
+        Task<IEnumerable<Category>> GetByUserIdAsync(string userId);
     }
 }

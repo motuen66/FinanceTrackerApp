@@ -11,6 +11,7 @@ namespace FinanceTracker.Services.Interfaces.Services
 {
     public interface ISavingGoalService : IGenericService<SavingGoal>
     {
-        public Task UpdateSavingGoalAsync(string id, SavingGoalMutationDto updateData);   
+        Task<IEnumerable<SavingGoal>> GetByUserIdAsync(string userId);
+        Task UpdateSavingGoalAsync(string id, SavingGoalMutationDto updateData);
     }
 }

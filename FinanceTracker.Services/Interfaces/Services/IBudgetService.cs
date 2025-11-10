@@ -11,5 +11,6 @@ namespace FinanceTracker.Services.Interfaces.Services
     public interface IBudgetService : IGenericService<Budget>
     {
         Task<List<BudgetViewDto>> GetAllIncludeCategoryAsync();
+        Task<List<BudgetViewDto>> GetAllIncludeCategoryByUserIdAsync(string userId);
     }
 }

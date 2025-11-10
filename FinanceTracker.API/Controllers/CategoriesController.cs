@@ -2,13 +2,15 @@ using AutoMapper;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.CategoryDtos;
 using FinanceTracker.Services.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoriesController : AuthenticatedControllerBase
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
@@ -22,7 +24,8 @@ namespace FinanceTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryViewDto>>> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync();
+            var userId = GetAuthenticatedUserId();
+            var categories = await _categoryService.GetByUserIdAsync(userId);
             return Ok(_mapper.Map<IEnumerable<CategoryViewDto>>(categories));
         }
 
@@ -33,6 +36,13 @@ namespace FinanceTracker.API.Controllers
             if (category == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this category
+            var userId = GetAuthenticatedUserId();
+            if (category.UserId != userId)
+            {
+                return Forbid();
             }
 
             return Ok(_mapper.Map<CategoryViewDto>(category));
@@ -46,7 +56,9 @@ namespace FinanceTracker.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var userId = GetAuthenticatedUserId();
             var category = _mapper.Map<Category>(dto);
+            category.UserId = userId; // Ensure category belongs to authenticated user
             await _categoryService.AddAsync(category);
 
             var view = _mapper.Map<CategoryViewDto>(category);
@@ -67,6 +79,13 @@ namespace FinanceTracker.API.Controllers
                 return NotFound();
             }
 
+            // Verify user owns this category
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
+            }
+
             _mapper.Map(dto, existing);
             await _categoryService.UpdateAsync(existing);
 
@@ -80,6 +99,13 @@ namespace FinanceTracker.API.Controllers
             if (existing == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this category
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
             }
 
             await _categoryService.DeleteAsync(id);

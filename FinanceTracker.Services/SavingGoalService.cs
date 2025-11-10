@@ -19,6 +19,11 @@ namespace FinanceTracker.Services
             _savingGoalRepository = savingGoalRepository;
         }
 
+        public Task<IEnumerable<SavingGoal>> GetByUserIdAsync(string userId)
+        {
+            return _savingGoalRepository.GetByUserIdAsync(userId);
+        }
+
         public async Task UpdateSavingGoalAsync(string id, SavingGoalMutationDto updateData)
         {
             var updateDefinitionBuilder = Builders<SavingGoal>.Update;

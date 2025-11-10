@@ -2,14 +2,16 @@
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.SavingGoalDtos;
 using FinanceTracker.Services.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class SavingGoalsController : ControllerBase
+    public class SavingGoalsController : AuthenticatedControllerBase
     {
         private readonly ISavingGoalService _savingGoalService;
         private readonly IMapper _mapper;
@@ -23,7 +25,8 @@ namespace FinanceTracker.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var goals = await _savingGoalService.GetAllAsync();
+            var userId = GetAuthenticatedUserId();
+            var goals = await _savingGoalService.GetByUserIdAsync(userId);
             var goalsDto = _mapper.Map<List<SavingGoalViewDto>>(goals);
             return Ok(goalsDto);
         }
@@ -36,6 +39,14 @@ namespace FinanceTracker.API.Controllers
             {
                 return NotFound();
             }
+
+            // Verify user owns this saving goal
+            var userId = GetAuthenticatedUserId();
+            if (goal.UserId != userId)
+            {
+                return Forbid();
+            }
+
             var goalDto = _mapper.Map<SavingGoalViewDto>(goal);
             return Ok(goalDto);
         }
@@ -47,7 +58,10 @@ namespace FinanceTracker.API.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            var userId = GetAuthenticatedUserId();
             var savingGoal = _mapper.Map<SavingGoal>(savingGoaldto);
+            savingGoal.UserId = userId; // Ensure saving goal belongs to authenticated user
 
             await _savingGoalService.AddAsync(savingGoal); 
 
@@ -67,6 +81,14 @@ namespace FinanceTracker.API.Controllers
             {
                 return NotFound();
             }
+
+            // Verify user owns this saving goal
+            var userId = GetAuthenticatedUserId();
+            if (existingGoal.UserId != userId)
+            {
+                return Forbid();
+            }
+
             _mapper.Map(savingGoalDto, existingGoal); 
             await _savingGoalService.UpdateAsync(existingGoal);
             return Ok(_mapper.Map<SavingGoalViewDto>(existingGoal));
@@ -86,6 +108,13 @@ namespace FinanceTracker.API.Controllers
                 return NotFound($"The goal is not found!");
             }
 
+            // Verify user owns this saving goal
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
+            }
+
             await _savingGoalService.UpdateSavingGoalAsync(id, updateDto);
             return Ok ();
         }
@@ -97,6 +126,14 @@ namespace FinanceTracker.API.Controllers
             {
                 return NotFound();
             }
+
+            // Verify user owns this saving goal
+            var userId = GetAuthenticatedUserId();
+            if (existingGoal.UserId != userId)
+            {
+                return Forbid();
+            }
+
             await _savingGoalService.DeleteAsync(id);
             return NoContent();
         }

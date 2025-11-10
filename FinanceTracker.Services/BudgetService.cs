@@ -39,5 +39,21 @@ namespace FinanceTracker.Services
 
             return budgetDtos;
         }
+
+        public async Task<List<BudgetViewDto>> GetAllIncludeCategoryByUserIdAsync(string userId)
+        {
+            IEnumerable<Budget> budgets = await _budgetRepository.GetByUserIdAsync(userId);
+            List<Budget> budgetList = budgets.ToList();
+
+            List<BudgetViewDto> budgetDtos = _mapper.Map<List<BudgetViewDto>>(budgetList);
+
+            foreach (BudgetViewDto b in budgetDtos) 
+            {
+                Category c = await _cateRepo.GetByIdAsync(b.CategoryId);
+                b.CategoryName = c?.Name ?? "Unknown";
+            }
+
+            return budgetDtos;
+        }
     }
 }

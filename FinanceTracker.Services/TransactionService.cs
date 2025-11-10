@@ -48,6 +48,22 @@ namespace FinanceTracker.Services
             return transactionDtos;
         }
 
+        public async Task<List<TransactionViewDto>> GetAllWithCategoryNameByUserIdAsync(string userId)
+        {
+            IEnumerable<Transaction> trans = await _transactionRepository.GetByUserIdAsync(userId);
+            trans = trans.ToList();
+
+            List<TransactionViewDto> transactionDtos = _mapper.Map<List<TransactionViewDto>>(trans);
+
+            foreach (TransactionViewDto tran in transactionDtos)
+            {
+                Category c = await _cateRepo.GetByIdAsync(tran.CategoryId);
+                tran.CategoryName = c?.Name ?? "Unknown";
+            }
+
+            return transactionDtos;
+        }
+
         public async Task<List<TransactionViewDto>> GetByRangeWithCategoryNameAsync(string userId, DateTime from, DateTime to)
         {
             IEnumerable<Transaction> trans = await _transactionRepository.GetByUserIdAndDateRangeAsync(userId, from, to);

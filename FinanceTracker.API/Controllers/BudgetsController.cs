@@ -2,13 +2,15 @@ using AutoMapper;
 using FinanceTracker.Domain;
 using FinanceTracker.Services.DTOs.BudgetDtos;
 using FinanceTracker.Services.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceTracker.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class BudgetsController : ControllerBase
+    public class BudgetsController : AuthenticatedControllerBase
     {
         private readonly IBudgetService _budgetService;
         private readonly IMapper _mapper;
@@ -22,7 +24,8 @@ namespace FinanceTracker.API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BudgetViewDto>>> GetAll()
         {
-            List<BudgetViewDto> budgets = await _budgetService.GetAllIncludeCategoryAsync();
+            var userId = GetAuthenticatedUserId();
+            List<BudgetViewDto> budgets = await _budgetService.GetAllIncludeCategoryByUserIdAsync(userId);
             return Ok(budgets);
         }
 
@@ -33,6 +36,13 @@ namespace FinanceTracker.API.Controllers
             if (budget == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this budget
+            var userId = GetAuthenticatedUserId();
+            if (budget.UserId != userId)
+            {
+                return Forbid();
             }
 
             return Ok(_mapper.Map<BudgetViewDto>(budget));
@@ -46,7 +56,9 @@ namespace FinanceTracker.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var userId = GetAuthenticatedUserId();
             var budget = _mapper.Map<Budget>(dto);
+            budget.UserId = userId; // Ensure budget belongs to authenticated user
             await _budgetService.AddAsync(budget);
 
             var view = _mapper.Map<BudgetViewDto>(budget);
@@ -67,6 +79,13 @@ namespace FinanceTracker.API.Controllers
                 return NotFound();
             }
 
+            // Verify user owns this budget
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
+            }
+
             _mapper.Map(dto, existing);
             await _budgetService.UpdateAsync(existing);
 
@@ -80,6 +99,13 @@ namespace FinanceTracker.API.Controllers
             if (existing == null)
             {
                 return NotFound();
+            }
+
+            // Verify user owns this budget
+            var userId = GetAuthenticatedUserId();
+            if (existing.UserId != userId)
+            {
+                return Forbid();
             }
 
             await _budgetService.DeleteAsync(id);

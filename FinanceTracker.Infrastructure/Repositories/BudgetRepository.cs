@@ -7,6 +7,7 @@ using FinanceTracker.Domain;
 using FinanceTracker.Infrastructure.Database;
 using FinanceTracker.Services.DTOs.BudgetDtos;
 using FinanceTracker.Services.Interfaces.Repositories;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace FinanceTracker.Infrastructure.Repositories
@@ -21,6 +22,12 @@ namespace FinanceTracker.Infrastructure.Repositories
             _context = context;
             // Use lowercase collection names to match BsonCollection attributes and existing DB
             _collection = context.GetCollection<Budget>("budgets");
+        }
+
+        public async Task<IEnumerable<Budget>> GetByUserIdAsync(string userId)
+        {
+            var filter = Builders<Budget>.Filter.Eq("userId", new ObjectId(userId));
+            return await Collection.Find(filter).ToListAsync();
         }
     }
 }
