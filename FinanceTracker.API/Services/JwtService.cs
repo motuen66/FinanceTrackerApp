@@ -51,7 +51,9 @@ namespace FinanceTracker.API.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Name, normalizedEmail)
+                    new Claim(JwtRegisteredClaimNames.Name, normalizedEmail),
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id), // Add userId as "sub" claim
+                    new Claim("userId", user.Id) // Also add as "userId" for clarity
                 }),
                 Expires = tokenExpiryTimeStamp,
                 Issuer = issuer,

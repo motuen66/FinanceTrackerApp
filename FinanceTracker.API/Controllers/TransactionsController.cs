@@ -33,8 +33,8 @@ namespace FinanceTracker.API.Controllers
             var fromDate = from.ToDateTime(TimeOnly.MinValue);
             var toExclusive = to.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-            var results = await _transactionService.GetByUserIdAndDateRangeAsync(userId ?? string.Empty, fromDate, toExclusive);
-            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(results));
+            var results = await _transactionService.GetByRangeWithCategoryNameAsync(userId ?? string.Empty, fromDate, toExclusive);
+            return Ok(results);
         }
 
         // GET api/transactions/bytype?type=Income&userId={userId}&from=2025-10-01&to=2025-10-31
@@ -57,27 +57,27 @@ namespace FinanceTracker.API.Controllers
                 toDt = to.Value.AddDays(1).ToDateTime(TimeOnly.MinValue); // exclusive
             }
 
-            var results = await _transactionService.GetByFilterAsync(userId, fromDt, toDt, type);
-            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(results));
+            var results = await _transactionService.GetByFilterWithCategoryNameAsync(userId, fromDt, toDt, type);
+            return Ok(results);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TransactionViewDto>>> GetAll()
         {
-            var transactions = await _transactionService.GetAllAsync();
-            return Ok(_mapper.Map<IEnumerable<TransactionViewDto>>(transactions));
+            List<TransactionViewDto> transactions = await _transactionService.GetAllWithCategoryNameAsync();
+            return Ok(transactions);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<TransactionViewDto>> GetById(string id)
         {
-            var transaction = await _transactionService.GetByIdAsync(id);
+            var transaction = await _transactionService.GetByIdWithCategoryNameAsync(id);
             if (transaction == null)
             {
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<TransactionViewDto>(transaction));
+            return Ok(transaction);
         }
 
         [HttpPost]

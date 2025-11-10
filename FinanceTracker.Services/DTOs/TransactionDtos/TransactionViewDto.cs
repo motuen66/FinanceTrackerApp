@@ -9,5 +9,6 @@ namespace FinanceTracker.Services.DTOs.TransactionDtos
         public string UserId { get; set; } = null!;
         public string Type { get; set; } = null!;
         public string CategoryId { get; set; } = null!;
+        public string CategoryName { get; set; } = null!;
     }
 }
