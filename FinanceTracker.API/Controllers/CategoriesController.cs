@@ -1,5 +1,6 @@
 using AutoMapper;
 using FinanceTracker.Domain;
+using FinanceTracker.Services;
 using FinanceTracker.Services.DTOs.CategoryDtos;
 using FinanceTracker.Services.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +15,13 @@ namespace FinanceTracker.API.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
+        private readonly IBudgetService _budgetService;
 
-        public CategoriesController(ICategoryService categoryService, IMapper mapper)
+        public CategoriesController(ICategoryService categoryService, IMapper mapper, IBudgetService budgetService)
         {
             _categoryService = categoryService;
             _mapper = mapper;
+            _budgetService = budgetService;
         }
 
         [HttpGet]
@@ -61,7 +64,16 @@ namespace FinanceTracker.API.Controllers
             category.UserId = userId; // Ensure category belongs to authenticated user
             await _categoryService.AddAsync(category);
 
-            var view = _mapper.Map<CategoryViewDto>(category);
+            CategoryViewDto view = _mapper.Map<CategoryViewDto>(category);
+            await _budgetService.AddAsync(new Budget
+            {
+                CategoryId = view.Id,
+                LimitAmount = 0,
+                Month = DateTime.UtcNow.Month,
+                Year = DateTime.UtcNow.Year,
+                UserId = userId
+            });
+
             return CreatedAtAction(nameof(GetById), new { id = view.Id }, view);
         }
 
